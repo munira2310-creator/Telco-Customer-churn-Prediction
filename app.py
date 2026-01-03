@@ -9,6 +9,9 @@ model = joblib.load('churn_model_final.pkl')
 features = joblib.load('model_columns.pkl')
 df = pd.read_csv('telco.csv') 
 
+# Clean column names (Removing extra spaces or hidden characters)
+df.columns = df.columns.str.strip()
+
 # Page Configuration
 st.set_page_config(page_title="Telco Churn AI Analytics", layout="wide", page_icon="📈")
 
@@ -38,34 +41,39 @@ with tab1:
         prediction = model.predict(input_data)
         
         st.subheader("Result:")
-        if prediction[0] == 1 or prediction[0] == True:
+        if prediction[0] == 1 or str(prediction[0]) == 'True':
             st.error("⚠️ High Risk: This customer is likely to CHURN.")
         else:
             st.success("✅ Low Risk: This customer is likely to STAY.")
 
 with tab2:
     st.header("Exploratory Data Analysis (EDA)")
-    col3, col4 = st.columns(2)
     
-    with col3:
-        st.subheader("Overall Churn Distribution")
-        fig, ax = plt.subplots()
-        # Using the correct column name 'Churn_Label'
-        df['Churn_Label'].value_counts().plot.pie(
-            autopct='%1.1f%%', 
-            ax=ax, 
-            colors=['#4CAF50','#FF5252'], 
-            explode=(0.05, 0)
-        )
-        ax.set_ylabel('')
-        st.pyplot(fig)
+    # Let's dynamically find the churn column to avoid KeyError
+    possible_names = ['Churn_Label', 'Churn Label', 'Churn', 'Customer_Status']
+    actual_col = next((col for col in possible_names if col in df.columns), None)
 
-    with col4:
-        st.subheader("Monthly Charges vs. Churn")
-        fig2, ax2 = plt.subplots()
-        # Using the correct column name 'Churn_Label'
-        sns.boxplot(x='Churn_Label', y='Monthly_Charge', data=df, ax=ax2, palette="Set2")
-        st.pyplot(fig2)
+    if actual_col:
+        col3, col4 = st.columns(2)
+        with col3:
+            st.subheader("Overall Churn Distribution")
+            fig, ax = plt.subplots()
+            df[actual_col].value_counts().plot.pie(
+                autopct='%1.1f%%', 
+                ax=ax, 
+                colors=['#4CAF50','#FF5252'], 
+                explode=(0.05, 0)
+            )
+            ax.set_ylabel('')
+            st.pyplot(fig)
+
+        with col4:
+            st.subheader("Monthly Charges vs. Churn")
+            fig2, ax2 = plt.subplots()
+            sns.boxplot(x=actual_col, y='Monthly_Charge', data=df, ax=ax2, palette="Set2")
+            st.pyplot(fig2)
+    else:
+        st.warning(f"Note: Could not find a churn column for charts. Available columns: {list(df.columns)}")
 
     st.divider()
     st.subheader("Raw Data Preview")
