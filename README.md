@@ -1,7 +1,3 @@
-# Telco-Customer-churn-Prediction
-
-
-
 \# 📊 Advanced Telco Customer Churn Prediction
 
 
@@ -12,7 +8,7 @@ This project features an End-to-End Machine Learning pipeline that predicts cust
 
 \## 🚀 Live Demo
 
-You can access the live application here: \*\*\[PASTE YOUR STREAMLIT APP LINK HERE]\*\*
+You can access the live application here: \*\*\[https://telco-customer-churn-prediction-aekhazcce9fj6hjfbv5r45.streamlit.app/]\*\*
 
 
 
